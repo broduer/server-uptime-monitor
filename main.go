@@ -14,6 +14,8 @@ type CLI struct {
 	ip    string
 }
 
+// "setCMD" function sets parameters according to the operating system on which it is run.
+// and gets the target remote server ip address from the user.
 func setCMD(cli CLI) CLI {
 	switch runtime.GOOS {
 	case "windows":
@@ -27,6 +29,9 @@ func setCMD(cli CLI) CLI {
 	return cli
 }
 
+// "check_loop" sends ICMP request to target server at 30 second intervals.
+// If it cannot reach the target server, it sends an ICMP request to 216.58.214.142 "www.google.com" to check whether the client is connected to the internet.
+// In case the client disconnects and the remote server does not respond to ICMP requests, it saves the date and response in the "log.txt" file.
 func check_loop(cli CLI) {
 	file, err := os.Create("log.txt")
 	if err != nil {
@@ -42,7 +47,7 @@ func check_loop(cli CLI) {
 			if out, _ := exec.Command("ping", cli.count, "1", "216.58.214.142").Output(); strings.Contains(strings.ToLower(string(out)), "unreachable") {
 				fmt.Printf("%d:%d:%d - Host network seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 				fmt.Fprintf(file, "%d:%d:%d - Host network seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
-			}else{
+			} else {
 				fmt.Printf("%d:%d:%d - Remote server seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 				fmt.Fprintf(file, "%d:%d:%d - Remote server seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 			}
@@ -51,7 +56,7 @@ func check_loop(cli CLI) {
 			line := strings.TrimSpace(lines[1])
 			fmt.Printf("%d:%d:%d - %s\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second(), line)
 		}
-		
+
 		time.Sleep(30 * time.Second)
 	}
 }
