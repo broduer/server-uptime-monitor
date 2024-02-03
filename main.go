@@ -38,23 +38,27 @@ func check_loop(cli CLI) {
 		fmt.Println("File not created:", err)
 		panic("exit")
 	}
-	fmt.Printf("Start time: %d:%d:%d\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+	fmt.Printf("Start time: D %d:M %d - %d:%d:%d\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 
 	for {
 		out, _ := exec.Command("ping", cli.count, "1", cli.ip).Output()
 
 		if strings.Contains(strings.ToLower(string(out)), "unreachable") {
 			if out, _ := exec.Command("ping", cli.count, "1", "216.58.214.142").Output(); strings.Contains(strings.ToLower(string(out)), "unreachable") {
-				fmt.Printf("%d:%d:%d - Host network seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
-				fmt.Fprintf(file, "%d:%d:%d - Host network seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+				fmt.Printf("D %d:M %d - %d:%d:%d - Host network seems down\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+				fmt.Fprintf(file, "D %d:M %d - %d:%d:%d - Host network seems down\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 			} else {
-				fmt.Printf("%d:%d:%d - Remote server seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
-				fmt.Fprintf(file, "%d:%d:%d - Remote server seems down\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+				fmt.Printf("D %d:M %d - %d:%d:%d - Remote server seems down\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+				fmt.Fprintf(file, "D %d:M %d - %d:%d:%d - Remote server seems down\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 			}
+		} else if strings.Contains(strings.ToLower(string(out)), "timed out") {
+			fmt.Printf("D %d:M %d - %d:%d:%d - Remote server timed out\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+
+			fmt.Fprintf(file, "D %d:M %d - %d:%d:%d - Remote server timed out\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 		} else {
 			lines := strings.Split(string(out), "\n")
-			line := strings.TrimSpace(lines[1])
-			fmt.Printf("%d:%d:%d - %s\n", time.Now().Hour(), time.Now().Minute(), time.Now().Second(), line)
+			line := strings.TrimSpace(lines[2])
+			fmt.Printf("D %d:M %d - %d:%d:%d - %s\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second(), line)
 		}
 
 		time.Sleep(30 * time.Second)
