@@ -12,6 +12,7 @@ import (
 type CLI struct {
 	count string
 	ip    string
+	pingL int
 }
 
 // "setCMD" function sets parameters according to the operating system on which it is run.
@@ -20,8 +21,10 @@ func setCMD(cli CLI) CLI {
 	switch runtime.GOOS {
 	case "windows":
 		cli.count = "-n"
+		cli.pingL = 2
 	default:
 		cli.count = "-c"
+		cli.pingL = 1
 	}
 	fmt.Printf("IP address: ")
 	fmt.Scan(&cli.ip)
@@ -57,7 +60,7 @@ func check_loop(cli CLI) {
 			fmt.Fprintf(file, "D %d:M %d - %d:%d:%d - Remote server timed out\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 		} else {
 			lines := strings.Split(string(out), "\n")
-			line := strings.TrimSpace(lines[2])
+			line := strings.TrimSpace(lines[cli.pingL])
 			fmt.Printf("D %d:M %d - %d:%d:%d - %s\n", time.Now().Day(), time.Now().Month(), time.Now().Hour(), time.Now().Minute(), time.Now().Second(), line)
 		}
 
